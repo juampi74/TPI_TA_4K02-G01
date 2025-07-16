@@ -89,10 +89,9 @@ void printStartupInfo() {
 // El simbolo & indica que las variables se pasan por referencia
 int readSensors(int &Ls, int &Cs, int &Rs) {
   // Leer sensores IR digitales
-  // Ahora sí 0 = línea negra, 1 = superficie blanca
-  Ls = !digitalRead(leftSensor);
-  Cs = !digitalRead(centerSensor);
-  Rs = !digitalRead(rightSensor);
+  Ls = digitalRead(leftSensor);
+  Cs = digitalRead(centerSensor);
+  Rs = digitalRead(rightSensor);
   
   // Codificar sensores en formato binario: sI sC sD (0bXXX)
   return (Ls << 2) | (Cs << 1) | Rs;
@@ -105,12 +104,12 @@ int calculateError(int sensorsData, int previousErrorLocal) {
   // Error = 0: linea centrada → seguir recto
   int errorLocal;
   switch (sensorsData) {
-    case 0b011: errorLocal = 16; break; // linea a la izquierda
-    case 0b001: errorLocal = 8; break; // linea levemente a la izquierda
-    case 0b101: errorLocal = 0;  break; // centrado
-    case 0b100: errorLocal = -8;  break; // linea levemente a la derecha
-    case 0b110: errorLocal = -16;  break; // linea a la derecha
-    case 0b111: errorLocal = previousErrorLocal; break; 
+    case 0b100: errorLocal = 8; break; // linea a la izquierda
+    case 0b110: errorLocal = 4; break; // linea levemente a la izquierda
+    case 0b010: errorLocal = 0;  break; // centrado
+    case 0b011: errorLocal = -4;  break; // linea levemente a la derecha
+    case 0b001: errorLocal = -8;  break; // linea a la derecha
+    case 0b000: errorLocal = previousErrorLocal; break; 
     default: errorLocal = 0; break;
   }
   return errorLocal;
@@ -149,8 +148,8 @@ void calculateSpeeds(float correction, int &leftSpeed, int &rightSpeed) {
   rightSpeed = baseSpeed + correction;
   
   // Aplicar limites y velocidad minima
-  leftSpeed = constrain(leftSpeed, 120, 255);
-  rightSpeed = constrain(rightSpeed, 120, 255);
+  leftSpeed = constrain(leftSpeed, 0, 255);
+  rightSpeed = constrain(rightSpeed, 0, 255);
 }
 
 // Funcion para controlar los motores
