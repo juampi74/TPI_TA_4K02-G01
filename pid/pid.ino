@@ -105,11 +105,11 @@ int calculateError(int sensorsData, int previousErrorLocal) {
   // Error = 0: linea centrada → seguir recto
   int errorLocal;
   switch (sensorsData) {
-    case 0b011: errorLocal = 4; break; // linea a la izquierda
-    case 0b001: errorLocal = 2; break; // linea levemente a la izquierda
+    case 0b011: errorLocal = 16; break; // linea a la izquierda
+    case 0b001: errorLocal = 8; break; // linea levemente a la izquierda
     case 0b101: errorLocal = 0;  break; // centrado
-    case 0b100: errorLocal = -2;  break; // linea levemente a la derecha
-    case 0b110: errorLocal = -4;  break; // linea a la derecha
+    case 0b100: errorLocal = -8;  break; // linea levemente a la derecha
+    case 0b110: errorLocal = -16;  break; // linea a la derecha
     case 0b111: errorLocal = previousErrorLocal; break; 
     default: errorLocal = 0; break;
   }
