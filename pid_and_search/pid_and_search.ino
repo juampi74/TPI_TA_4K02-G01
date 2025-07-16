@@ -1,14 +1,14 @@
 // ==== Auto Seguidor de Línea con PID + Búsqueda de Línea ====
 
-// ==== Pines motor izquierdo (Motor 1) ====
+// ==== Pines motor derecho (Motor 1) ====
 const int in1 = 13;
 const int in2 = 12;
-const int ena = 11; // PWM - velocidad motor izquierdo
+const int ena = 11; // PWM - velocidad motor derecho
 
-// ==== Pines motor derecho (Motor 2) ====
+// ==== Pines motor izquierdo (Motor 2) ====
 const int in3 = 8;
 const int in4 = 3;
-const int enb = 5; // PWM - velocidad motor derecho
+const int enb = 9; // PWM - velocidad motor izquierdo
 
 // ==== Pines sensores IR ====
 const int leftSensor = 2;
@@ -16,16 +16,16 @@ const int centerSensor = 4;
 const int rightSensor = 7;
 
 // ==== Variables PID ====
-float kp = 15.0;  // Proporcional
-float ki = 0.3;  // Integral - para corregir errores acumulados
-float kd = 5.0;  // Derivativo - para suavizar la respuesta
+float kp = 25.0;  // Proporcional
+float ki = 0.0;  // Integral - para corregir errores acumulados
+float kd = 0.0;  // Derivativo - para suavizar la respuesta
 
 // ==== Variables de control PID ====
 float integral = 0.0;
 float previousError = 0.0;
 unsigned long previousTime = 0;
 
-int baseSpeed = 135;  // Velocidad base como la mitad de la máxima
+int baseSpeed = 125;  // Velocidad base como la mitad de la máxima
 
 // ==== Variables de búsqueda de línea ====
 int searchDirection = 0;   // 1 = izquierda, -1 = derecha
@@ -38,8 +38,9 @@ int same_side = 0;         // Lado igual al último error
 unsigned long searchCycleStartTime = 0; // Inicio del ciclo actual de la búsqueda
 unsigned long searchTotalStartTime = 0; // Inicio total de la búsqueda
 
-const int SEARCH_TURN_SPEED = 175; // Velocidad de giro
-const int SOFT_FORWARD_SPEED = 125; // Velocidad de avance leve en fase 1
+const int SEARCH_TURN_SPEED = 105; // Velocidad de giro
+const int SOFT_FORWARD_SPEED = 75; // Velocidad de avance leve en fase 1
+const int MIN_SPEED = 60;
 
 const unsigned long SEARCH_CYCLE_TIMEOUT = 2000; // Tiempo entre ciclos de búsqueda
 const unsigned long SEARCH_TOTAL_TIMEOUT = 10000; // Detener búsqueda después de cierto tiempo sin encontrar la línea
@@ -104,11 +105,11 @@ int calculateError(int sensorsData) {
   // Error negativo: linea a la derecha → girar derecha
   // Error = 0: linea centrada → seguir recto
   switch (sensorsData) {
-    case 0b100: return  4;  // línea a la izquierda
-    case 0b110: return  2;  // línea ligeramente a la izquierda
+    case 0b100: return  8;  // línea a la izquierda
+    case 0b110: return  4;  // línea ligeramente a la izquierda
     case 0b010: return  0;  // línea centrada
-    case 0b011: return -2;  // línea ligeramente a la derecha
-    case 0b001: return -4;  // línea muy a la derecha
+    case 0b011: return -4;  // línea ligeramente a la derecha
+    case 0b001: return -8;  // línea muy a la derecha
     default:    return  0;
   }
 }
@@ -144,13 +145,13 @@ void calculateSpeeds(float correction, int &leftSpeed, int &rightSpeed) {
   rightSpeed = (int) round(baseSpeed + correction);
 
   // Limitar las velocidades al rango válido
-  leftSpeed = constrain(leftSpeed, 120, 255);
-  rightSpeed = constrain(rightSpeed, 120, 255);
+  leftSpeed = constrain(leftSpeed, MIN_SPEED, 255);
+  rightSpeed = constrain(rightSpeed, MIN_SPEED, 255);
 }
 
 void drive(int leftSpeed, int rightSpeed) {
-  digitalWrite(in1, HIGH); digitalWrite(in2, LOW); analogWrite(ena, leftSpeed);  // Motor izquierdo
-  digitalWrite(in3, HIGH); digitalWrite(in4, LOW); analogWrite(enb, rightSpeed); // Motor derecho
+  digitalWrite(in1, HIGH); digitalWrite(in2, LOW); analogWrite(ena, leftSpeed);  // Motor derecho
+  digitalWrite(in3, HIGH); digitalWrite(in4, LOW); analogWrite(enb, rightSpeed); // Motor izquierdo
 }
 
 void searchLine() {
