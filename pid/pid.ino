@@ -88,12 +88,13 @@ void printStartupInfo() {
 
 // El simbolo & indica que las variables se pasan por referencia
 int readSensors(int &Ls, int &Cs, int &Rs) {
-  // Leer sensores IR digitales (1: línea negra, 0: superficie blanca)
-  Ls = digitalRead(leftSensor);
-  Cs = digitalRead(centerSensor);
-  Rs = digitalRead(rightSensor);
+  // Leer sensores IR digitales
+  // Ahora sí 0 = línea negra, 1 = superficie blanca
+  Ls = !digitalRead(leftSensor);
+  Cs = !digitalRead(centerSensor);
+  Rs = !digitalRead(rightSensor);
   
-  // Codificar sensores en formato binario: Ls Cs Rs (0bXYZ)
+  // Codificar sensores en formato binario: sI sC sD (0bXXX)
   return (Ls << 2) | (Cs << 1) | Rs;
 }
 
@@ -104,12 +105,12 @@ int calculateError(int sensorsData, int previousErrorLocal) {
   // Error = 0: linea centrada → seguir recto
   int errorLocal;
   switch (sensorsData) {
-    case 0b100: errorLocal = 4; break; // linea a la izquierda
-    case 0b110: errorLocal = 2; break; // linea levemente a la izquierda
-    case 0b010: errorLocal = 0;  break; // centrado
-    case 0b011: errorLocal = -2;  break; // linea levemente a la derecha
-    case 0b001: errorLocal = -4;  break; // linea a la derecha
-    case 0b000: errorLocal = previousErrorLocal; break; 
+    case 0b011: errorLocal = 4; break; // linea a la izquierda
+    case 0b001: errorLocal = 2; break; // linea levemente a la izquierda
+    case 0b101: errorLocal = 0;  break; // centrado
+    case 0b100: errorLocal = -2;  break; // linea levemente a la derecha
+    case 0b110: errorLocal = -4;  break; // linea a la derecha
+    case 0b111: errorLocal = previousErrorLocal; break; 
     default: errorLocal = 0; break;
   }
   return errorLocal;
@@ -200,9 +201,9 @@ void debugInfo(int Ls, int Cs, int Rs, int sensorsData, int error, float correct
   Serial.print(rightSpeed);
   
   // Indicar direccion de movimiento
-  if (error > 0) {
+  if (error < 0) {
     Serial.print(" [IZQUIERDA]");
-  } else if (error < 0) {
+  } else if (error > 0) {
     Serial.print(" [DERECHA]");
   } else {
     Serial.print(" [RECTO]");
