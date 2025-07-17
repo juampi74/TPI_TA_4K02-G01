@@ -123,7 +123,7 @@ int calculateError(int sensorsData) {
 // componente derivativo se dispare por variaciones muy pequeñas en el tiempo
 float PID(int currentError) {
   // Sumar el error actual a la acumulacion total (componente integral)
-  // Ayuda a corregir errores sistemáticos o sesgos en el sistema
+  // Ayuda a corregir errores sistematicos o sesgos en el sistema
   integral += currentError;
   
   // Prevenir el "integral wind-up" limitando el valor acumulado

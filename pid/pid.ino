@@ -94,7 +94,7 @@ int calculateError(int sensorsData) {
     case 0b010: return  0; // centrado
     case 0b011: return -4; // linea levemente a la derecha
     case 0b001: return -8; // linea a la derecha
-    case 0b000: return previousError; // Si pierde la línea, mantener el error anterior
+    case 0b000: return previousError; // Si pierde la linea, mantener el error anterior
     default: return 0;
   }
 }
@@ -105,7 +105,7 @@ int calculateError(int sensorsData) {
 // componente derivativo se dispare por variaciones muy pequeñas en el tiempo
 float PID(int currentError) {
   // Sumar el error actual a la acumulacion total (componente integral)
-  // Ayuda a corregir errores sistemáticos o sesgos en el sistema
+  // Ayuda a corregir errores sistematicos o sesgos en el sistema
   integral += currentError;
   
   // Prevenir el "integral wind-up" limitando el valor acumulado
