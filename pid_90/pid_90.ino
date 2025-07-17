@@ -117,7 +117,6 @@ int calculateError(int sensorsData) {
   }
 }
 
-
 // ==== Algoritmo PID ====
 // Dado que el loop() se ejecuta a una frecuencia constante, no se involucra al tiempo
 // explicitamente en los terminos integral y derivativo, evitando asi tambien que el
